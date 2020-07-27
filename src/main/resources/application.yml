@@ -1,0 +1,25 @@
+spring:
+    datasource:
+        url: jdbc:postgresql://localhost:5432/postgres
+        username: ${DATABASE_USER:postgres}
+        password: ${DATABASE_PASSWORD:postgres}
+        platform: postgres
+    jpa:
+        # Disable feature detection by this undocumented parameter.
+        # Check the org.hibernate.engine.jdbc.internal.JdbcServiceImpl.configure method for more details.
+        properties:
+            database-platform: org.hibernate.dialect.PostgreSQLDialect
+            hibernate:
+                temp:
+                    use_jdbc_metadata_defaults: false
+                dialect: org.hibernate.dialect.PostgreSQLDialect
+                default_schema: watch
+                show-sql: true
+        hibernate:
+            ddl-auto: validate
+        open-in-view: false
+    flyway:
+        schemas: watch
+
+server:
+    port: 8080
