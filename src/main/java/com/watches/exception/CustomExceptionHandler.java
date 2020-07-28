@@ -1,16 +1,19 @@
 package com.watches.exception;
 
-import com.watches.validation.ApiError;
+import com.watches.validation.ApiValidationError;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.ObjectError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
+
+import java.util.Optional;
 
 import static org.springframework.http.HttpStatus.BAD_REQUEST;
 import static org.springframework.http.HttpStatus.CONFLICT;
@@ -22,8 +25,8 @@ public class CustomExceptionHandler extends ResponseEntityExceptionHandler {
 
     @ExceptionHandler(TitleAlreadyExistsException.class)
     public final ResponseEntity<?> handleConflictExceptions(Exception ex) {
-        ApiError apiError = new ApiError(CONFLICT, "Title already exists", ex);
-        return buildResponseEntity(apiError);
+        ApiValidationError apiValidationError = new ApiValidationError(CONFLICT, "Title already exists");
+        return buildResponseEntity(apiValidationError);
     }
 
     /**
@@ -41,14 +44,18 @@ public class CustomExceptionHandler extends ResponseEntityExceptionHandler {
             HttpHeaders headers,
             HttpStatus status,
             WebRequest request) {
-        ApiError apiError = new ApiError(BAD_REQUEST);
-        apiError.setMessage("Validation error");
-        apiError.addValidationErrors(ex.getBindingResult().getFieldErrors());
-        apiError.addValidationError(ex.getBindingResult().getGlobalErrors());
-        return buildResponseEntity(apiError);
+        ApiValidationError apiValidationError = new ApiValidationError();
+        Optional<ObjectError> error = ex.getBindingResult().getAllErrors().stream().findFirst();
+        error.ifPresent(
+                e -> {
+                    apiValidationError.setStatus(BAD_REQUEST);
+                    apiValidationError.setMessage(e.getDefaultMessage());
+                }
+        );
+        return buildResponseEntity(apiValidationError);
     }
 
-    private ResponseEntity<Object> buildResponseEntity(ApiError apiError) {
-        return new ResponseEntity<>(apiError, apiError.getStatus());
+    private ResponseEntity<Object> buildResponseEntity(ApiValidationError apiValidationError) {
+        return new ResponseEntity<>(apiValidationError, apiValidationError.getStatus());
     }
 }
