@@ -20,7 +20,7 @@
         <com.fasterxml.jackson.version>2.11.1</com.fasterxml.jackson.version>
         <javax.xml.bind.version>2.3.1</javax.xml.bind.version>
         <commons.io.version>2.7</commons.io.version>
-        <org.apache.tika.version>1.24.1</org.apache.tika.version>
+        <org.apache.tika.version>1.28.3</org.apache.tika.version>
         <org.hibernate.validator.version>6.1.5.Final</org.hibernate.validator.version>
         <org.junit.jupiter.version>5.6.2</org.junit.jupiter.version>
         <org.mockito.version>3.4.4</org.mockito.version>
